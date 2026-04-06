@@ -1,5 +1,5 @@
 //npx prisma studio to  see the users
-const { PrismaClient } = require('../generated/prisma');
+const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 // use `prisma` in your application to read and write data in your DB
 

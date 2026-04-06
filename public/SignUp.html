@@ -1,45 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SignUp</title>
-    <style>
-        body{
-            display: grid;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 50px;
-        }
-        form{
-            display: grid;
-            justify-content: center;
-            align-items: center;
-        }
-        button{
-            margin-top: 12px;
-            width:150px;
-            height: 50px;
-        }
-        input{
-            width:300px;
-            height: 30px;
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SignUp</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        }
+    :root {
+      --bg: #0d0d0f;
+      --surface: #161618;
+      --surface2: #1e1e22;
+      --border: rgba(255,255,255,0.07);
+      --accent: #7c6af7;
+      --text: #e8e8ec;
+      --muted: #6b6b7a;
+    }
 
-    </style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 36px 36px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .brand-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c6af7, #f76a8a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .brand-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    input {
+      width: 100%;
+      height: 44px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 0 14px 0 38px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input::placeholder { color: var(--muted); }
+
+    input:focus {
+      border-color: rgba(124,106,247,0.5);
+      box-shadow: 0 0 0 3px rgba(124,106,247,0.1);
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      height: 46px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    button[type="submit"]:hover { background: #6c5af0; transform: translateY(-1px); }
+    button[type="submit"]:active { transform: translateY(0); }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .login-link a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-link a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
-    <h1>SIGNUP</h1>
-    <form action="/signUp" method="POST">
-        <label >Name:</label>
-        <input type="text" name="name" placeholder="Enter Username" required>
-        <label >Email:</label>
-        <input type="text" name="email" placeholder="example@123.com" required>
-        <label >Password:</label>
-        <input type="password" name="password" placeholder="Enter Password" required>
-        <button type="submit">Signup</button>
-        </form>
+
+<div class="card">
+  <div class="brand">
+    <div class="brand-icon">💬</div>
+    <span class="brand-name">ChatApp</span>
+  </div>
+
+  <h1>Create account</h1>
+  <p class="subtitle">Join the conversation — it's free.</p>
+
+  <form action="/signUp" method="POST">
+    <div class="field">
+      <label for="name">Name</label>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input type="text" id="name" name="name" placeholder="Enter your name" required/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <div class="input-wrap">
+        <span class="input-icon">✉️</span>
+        <input type="email" id="email" name="email" placeholder="example@email.com" required/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input type="password" id="password" name="password" placeholder="Create a password" required/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="roomId">RoomId</label>
+      <div class="input-wrap">
+        <span class="input-icon">✉️</span>
+        <input type="number" id="roomId" name="roomId" placeholder="0" required/>
+      </div>
+    </div>
+
+    <button type="submit">Create account</button>
+  </form>
+
+  <p class="login-link">Already have an account? <a href="/login">Sign in</a></p>
+</div>
+
 </body>
 </html>

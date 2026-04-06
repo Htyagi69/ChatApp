@@ -36,18 +36,23 @@ io.use((socket, next) => {
   socket.userId = decoded.userid;
   next();
 });
-
+ 
 
 //it supports socket.io
 io.on('connection',async (socket)=>{
-      console.log('User connected:', socket.id,'UserID:', socket.userId);
-    const messages= await Chat.find({}).sort({createdAt:1}).lean(10);
-    
+  const roomno=socket.handshake.query.roomId;
+  if(roomno){
+    socket.join(roomno)
+    console.log(`Socket ${socket.id} joined room: ${roomno}`);  
+  }
+      console.log('User connected:', socket.id,'UserID:', socket.userId,"RoomNo:",roomno);
+      const messages= await Chat.find({"roomId":roomno}).sort({createdAt:1}).lean(10);
+      
    messages.forEach((msg) => {
   if (msg.type === 'text') {
-    socket.emit('message', { id: msg.senderId, text: msg.text ,name: msg.name || 'Anonymous' });
+    socket.emit('message', { id: msg.senderId, text: msg.text ,name: msg.name || 'Anonymous',roomId:msg.roomId });
   } else if (msg.type === 'file') {
-    socket.emit('file', { id: msg.senderId, file: msg.text,name: msg.name || 'Anonymous' });
+    socket.emit('file', { id: msg.senderId, file: msg.text,name: msg.name || 'Anonymous',roomId:msg.roomId });
   }
 });
  
@@ -60,11 +65,12 @@ io.on('connection',async (socket)=>{
             name:msg.name || 'Anonymous', // Use msg.name if available, otherwise default to 'Anonymous'
             status:isSender?'sent':'received',
             sent:isSender,
+            roomId:msg.roomId,
         })
         await message.save();
         // console.log('a new user message',msg);
         //FOR MESSAGEE TO BE DISPLLAYED TO ALL USERS
-        io.emit('message',{id:socket.id,text:msg.text,name:msg.name || 'Anonymous',status:isSender?'sent':'received'});
+        io.to(msg.roomId).emit('message',{id:socket.id,text:msg.text,name:msg.name || 'Anonymous',status:isSender?'sent':'received',roomId:msg.roomId});
     })
 })
 
@@ -99,6 +105,9 @@ app.get('/login', (req, res) => {
 
 app.post('/signUp', async (req, res) => {
   try {
+    roomno=req.roomId;
+    console.log(roomno);
+    
     await signup(req, res);
   } catch (err) {
     console.error("Signup failed:", err);
@@ -106,9 +115,11 @@ app.post('/signUp', async (req, res) => {
   }
 });
 app.post('/login', async (req, res) => {
-
+  
   // You can implement real DB logic here
   try{
+    roomno=req.roomId;
+    console.log(roomno);
     await login(req, res);
     // res.send('Login successful!');
   } catch (err) {
@@ -120,11 +131,12 @@ app.post('/login', async (req, res) => {
 
 app.get('/', requireAuth, (req, res) => {
   const userName = req.cookies.username;
-
-  if (userName) {
-    return res.redirect(`/Advance.html?name=${encodeURIComponent(userName)}`);
+  const roomId=req.cookies.roomId;
+  console.log("cookie",req.cookies.roomId);
+  
+  if (userName && roomId) {
+    return res.redirect(`/Advance.html?name=${encodeURIComponent(userName)}&roomId=${encodeURIComponent(roomId)}`);
   }
-
   // fallback if cookie missing
   res.redirect('/login');
 });
@@ -137,6 +149,7 @@ app.post('/',requireAuth,upload.single('profileImage'),async (req,res)=>{
   }
 
  const filePath = `/uploads/${req.file.filename}`;
+ const roomNo=req.query.roomId|| req.body.roomId;
 const senderId = req.body.senderId || 'server'; // get sender from form
 
 // Save to MongoDB
@@ -145,11 +158,12 @@ const fileMessage = new Chat({
   senderId,
   type: 'file',
   name: req.body.name || 'Anonymous', // Use req.body.name if available, otherwise default to 'Anonymous'
+  roomId:roomNo,
 });
 await fileMessage.save();
 
 // Emit to all users
-io.emit('file', { id: senderId, file: filePath, name: req.body.name || 'Anonymous' });
+io.to(roomNo).emit('file', { id: senderId, file: filePath, name: req.body.name || 'Anonymous',roomId:roomNo });
 
 res.sendStatus(200); // Do NOT redirect to '/'
 })

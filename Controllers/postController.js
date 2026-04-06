@@ -4,7 +4,7 @@ const  cookie  = require('../authcookie/cookie');
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password,roomId } = req.body;
     console.log("Login attempt with email:", email,password);
     if (!email || !password) throw new Error("All fields are required");
 
@@ -15,11 +15,14 @@ exports.login = async (req, res) => {
    if (password !== user.password) {
   return res.status(401).send("Invalid credentials");
 }
+//    if (roomId !== user.roomId) {
+//   return res.status(401).send("Invalid credentials");
+// }
 
 
     cookie(user, res);
     console.log("Login successful for user:", user.name);
-    res.redirect(`/Advance.html?name=${encodeURIComponent(user.name)}`);
+    res.redirect(`/Advance.html?name=${encodeURIComponent(user.name)}&roomId=${encodeURIComponent(roomId)}`);
   } catch (err) {
     console.error("Login Error:", err);
     res.status(500).send("Something went wrong");

@@ -4,365 +4,496 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatAPP</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
     <style>
-      
-        body{
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+        :root {
+            --bg: #0d0d0f;
+            --surface: #161618;
+            --surface2: #1e1e22;
+            --border: rgba(255,255,255,0.07);
+            --accent: #7c6af7;
+            --text: #e8e8ec;
+            --muted: #6b6b7a;
+            --sent-bg: linear-gradient(135deg, #7c6af7, #a78bfa);
+            --recv-bg: #242428;
+        }
+ 
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column; 
-             /* background-image: url('/background.webp'); */
-              background-color: black
-      }
-      
-      .videobtn{
-        position: absolute;
-        top: 20px;
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-      }
-      textarea,button{
-        display: inline;
-        font-size:15px;
-      }
-      textarea{
-        display: flex;
-        flex-wrap: wrap;
-        width: 500px;
-        height: 20px;
-        border-radius: 10px;
-        padding: 30px;
-        overflow-y: scroll;
-        scrollbar-width: none;
-        background-color: rgb(40, 40, 40);
-        color: white;
-        margin-left: 150px;
-      }
-      button{
-        width: 60px;  
-        height: 40px;      
-        border-radius: 5px;
-        background-color: blue;
-        color: white;
-        margin-left: 20px;
-      }
-   .chatroom{
-        border-radius: 10px;
-        /* background-color: white; */
-        width: 100%;
-        height: 550px;
-        overflow-y: scroll;
-        scrollbar-color: gray;   
-         scrollbar-width: none;  
-      }
-    
-      #messages {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 20px;
-  /* resize: both;
-  overflow: auto; */
-}
-.message {
-  max-width: 70%;
-  padding: 10px 15px;
-  border-radius: 10px;
-  word-wrap: break-word;
-  color: black;
-}
-
-     .sent {
-  align-self: flex-end;
-  background-color: pink;
-}
-
-.received {
-  align-self: flex-start;
-  background-color: yellow;
-}
-input[type="file"] {
-    display: none;
-}
-.file-label {
-
-  font-size: 24px;
-  cursor: pointer;
-  padding: 10px;
-  transition: background 0.3s;
-}
-
-.file-label:hover {
-  background-color: #666;
-}
+            min-height: 100vh;
+            padding: 20px;
+        }
+ 
+        .app-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            height: 600px;
+            background: var(--surface);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+        }
+ 
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            flex-shrink: 0;
+        }
+ 
+        .avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c6af7 0%, #f76a8a 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 16px; color: #fff; font-weight: 700;
+            flex-shrink: 0;
+        }
+ 
+        .header-info { flex: 1; }
+ 
+        .header-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px; font-weight: 700;
+            color: var(--text); letter-spacing: 0.01em;
+        }
+ 
+        .header-status {
+            font-size: 12px; color: #4ade80;
+            display: flex; align-items: center; gap: 5px; margin-top: 2px;
+        }
+        .header-status::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%; background: #4ade80;
+            display: inline-block;
+        }
+ 
+        .header-actions { display: flex; gap: 6px; }
+ 
+        .icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--muted);
+            transition: all 0.2s ease;
+            font-size: 15px;
+        }
+        .icon-btn:hover {
+            background: rgba(124,106,247,0.15);
+            color: var(--accent);
+            border-color: rgba(124,106,247,0.3);
+        }
+ 
+        /* Messages */
+        .chatroom {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.08) transparent;
+        }
+        .chatroom::-webkit-scrollbar { width: 4px; }
+        .chatroom::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+ 
+        #messages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+        }
+ 
+        .date-divider {
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 14px 0 4px;
+        }
+ 
+        /* Original class names kept — restyled */
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+ 
+        .sent {
+            align-self: flex-end;
+            background: var(--sent-bg);
+            color: #fff !important;
+            border-bottom-right-radius: 4px;
+        }
+ 
+        .received {
+            align-self: flex-start;
+            background: var(--recv-bg);
+            color: var(--text) !important;
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+ 
+        /* Input Area */
+        .input-area {
+            padding: 12px 16px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            flex-shrink: 0;
+        }
+ 
+        .input-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px 8px 8px 14px;
+            transition: border-color 0.2s;
+        }
+        .input-row:focus-within { border-color: rgba(124,106,247,0.4); }
+ 
+        /* Original textarea — id kept, restyled */
+        #message {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            resize: none;
+            max-height: 100px;
+            min-height: 24px;
+            height: 24px;
+            line-height: 1.5;
+            padding: 4px 0;
+            scrollbar-width: none;
+            width: auto;
+            margin: 0;
+        }
+        #message::placeholder { color: var(--muted); }
+        #message::-webkit-scrollbar { display: none; }
+ 
+        /* Original file-label — restyled */
+        .file-label {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--muted);
+            font-size: 20px;
+            transition: color 0.2s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .file-label:hover { color: var(--accent); background: transparent; }
+ 
+        input[type="file"] { display: none; }
+ 
+        /* Original send button — id kept, restyled */
+        #send {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: var(--accent);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: background 0.2s, transform 0.15s;
+            padding: 0;
+            margin: 0;
+        }
+        #send:hover { background: #6c5af0; transform: scale(1.05); }
+        #send:active { transform: scale(0.95); }
+ 
+        /* Original videobtn — hidden, logic moved to header icon */
+        .videobtn { display: none; }
     </style>
 </head>
-<body style="background-color: black;">
-    <!-- <h1 style="color: beige;">Chatting  App</h1> -->
-     <!-- 📹 Video Call Button -->
-<button class="videobtn" id="startVideoCallBtn">
-  <img src="video-chat.png" width="60px" height="60px" alt="Video Call">
-</button>
-
+<body>
+ 
+<div class="app-wrapper">
+ 
+    <!-- Header with video call button (same logic as original startVideoCallBtn) -->
+    <div class="header">
+        <div class="avatar">👨‍💻</div>
+        <div class="header-info">
+            <div class="header-name" id="chatTitle">Chat Room</div>
+            <div class="header-status">Online</div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="startVideoCallBtn" title="Video Call"><img width="50px" src="./video-calling.png"/></button>
+        </div>
+    </div>
+ 
+    <!-- Original hidden button kept for any external references -->
+    <button class="videobtn" id="startVideoCallBtnHidden"></button>
+ 
+    <!-- Original chatroom + messages structure preserved -->
     <div class="chatroom">
+        <div class="date-divider">Today</div>
         <div id="messages"></div>
     </div>
-    <div class="box" style="display: flex; flex-direction: row; align-items: center;">
-<textarea id="message" placeholder="Type your message here..."  ></textarea>
-
-        <form  id="uploadForm" action="/" method="post" enctype="multipart/form-data">
-          <input type="hidden" name="senderId" id="senderId">
-            <label for="profileImage" class="file-label ">
-                <img src="submit.png" alt="📎" style="width: 30px;">
-            </label>
-        <input type="file" name="profileImage" id="profileImage" placeholder="📎">
-      </form>
-      <button  id="send" style="padding: 10px; border-radius: 5px; background-color: rgb(240, 125, 125); color: white;">Send</button>
-
-    </div>    
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-          //videocall
-  document.getElementById('startVideoCallBtn').addEventListener('click', () => {
-  // Open your WebRTC video call app in a new tab
-  window.open('https://video-calling-8jks.vercel.app/', '_blank');
-});
-
-
-          const chatRoom = document.querySelector('.chatroom');
-          function scrollToBottom() {
-            chatRoom.scrollTop = chatRoom.scrollHeight; // Scroll to the bottom on load
-          };
-          window.onload = scrollToBottom; // Scroll to bottom when the page loads
-    const socket = io();
-     let myId;
-
-       const params = new URLSearchParams(window.location.search);
-       const name = params.get("name") || "Anonymous";
-
-    socket.on('connect', () => {
-      myId = socket.id;
+ 
+    <!-- Input bar — all original ids preserved -->
+    <div class="input-area">
+        <div class="input-row">
+            <textarea id="message" placeholder="Type your message here..."></textarea>
+ 
+            <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="senderId" id="senderId">
+                <label for="profileImage" class="file-label" title="Attach file">📎</label>
+                <input type="file" name="profileImage" id="profileImage">
+            </form>
+ 
+            <button id="send">➤</button>
+        </div>
+    </div>
+ 
+</div>
+ 
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    // ── New: auto-grow textarea ──
+    const messageInput = document.getElementById('message');
+    messageInput.addEventListener('input', () => {
+        messageInput.style.height = 'auto';
+        messageInput.style.height = Math.min(messageInput.scrollHeight, 100) + 'px';
     });
-    const messageInput=document.getElementById('message');
-    const sendBtn=document.getElementById('send');
-    const allMessages=document.getElementById('messages');
-     socket.on('message',(message)=>{
-      const msgBox=document.createElement('div');
-        const para=document.createElement('p');
+ 
+    // ── New: show user's name in header ──
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "Anonymous"; 
+    const roomId = params.get("roomId") || "Anonymous"; 
+    document.getElementById('chatTitle').textContent = name !== "Anonymous" ? `Hi, ${name} 👋` : "Chat Room";
+ 
+    document.getElementById('startVideoCallBtn').addEventListener('click', () => {
+        window.open('https://video-calling-8jks.vercel.app/', '_blank');
+    });
+ 
+    const chatRoom = document.querySelector('.chatroom');
+    function scrollToBottom() {
+        chatRoom.scrollTop = chatRoom.scrollHeight;
+    };
+    window.onload = scrollToBottom;
+ 
+    const socket = io({
+      query:{
+        roomId:roomId,
+      }
+    });
+    let myId;
+ 
+    socket.on('connect', () => {
+        myId = socket.id;
+        
+    });
+ 
+    const sendBtn = document.getElementById('send');
+    const allMessages = document.getElementById('messages');
+ 
+    socket.on('message', (message) => {
+        const msgBox = document.createElement('div');
+        const para = document.createElement('p');
         const nameSpan = document.createElement('span');
         nameSpan.textContent = message.name + ": ";
-        // para.innerText=message.text+" --> "+message.id;
-        para.innerText=message.text;
+        para.innerText = message.text;
         console.log(message.id);
         msgBox.appendChild(nameSpan);
         msgBox.appendChild(para);
-        scrollToBottom(); // Scroll to the bottom when a new message is added
-          msgBox.classList.add('message');
-          
-          if (message.name === name) {
-            msgBox.classList.add('sent')
-            
-          } else {
+        scrollToBottom();
+        msgBox.classList.add('message');
+ 
+        if (message.name === name) {
+            msgBox.classList.add('sent');
+        } else {
             msgBox.classList.add('received');
-          }
-          allMessages.appendChild(msgBox);
-          // para.style.backgroundColor = 'rgb(214, 7, 76)';
-          nameSpan.style.fontWeight = 'bold';
-          nameSpan.style.color = 'blue';  
-        para.style.color = 'black';
-       msgBox.style.padding = '2px 6px';
-       msgBox.style.borderRadius = '10px';
-       msgBox.style.maxWidth = '40%';
-       msgBox.style.wordWrap = 'break-word';
-       msgBox.style.margin = '10px';
-// Removed or fixed this:
-      msgBox.style.minHeight = 'auto'; // Let it adjust to content height
-
-     });
-     sendBtn.addEventListener("click",(e)=>{
-       const message=messageInput.value.trim();
-        if(message===""){
+        }
+        allMessages.appendChild(msgBox);
+        nameSpan.style.fontWeight = 'bold';
+        nameSpan.style.color = 'blue';
+        para.style.color = 'inherit';
+        msgBox.style.padding = '2px 6px';
+        msgBox.style.borderRadius = '10px';
+        msgBox.style.maxWidth = '40%';
+        msgBox.style.wordWrap = 'break-word';
+        msgBox.style.margin = '10px';
+        msgBox.style.minHeight = 'auto';
+    });
+ 
+    sendBtn.addEventListener("click", (e) => {
+        const message = messageInput.value.trim();
+        if (message === "") {
             return 0;
         }
         console.log(message);
-
-        socket.emit('user-message',{
-          text:message,
-          name: name,
-          senderId: myId,
-     })
-        messageInput.value="";
-      })
-      //for form submission 
-  // for file upload without redirect and URL loss
-document.getElementById('profileImage').addEventListener('change', async function () {
-  const file = this.files[0];
-  if (!file) return;
-
-  const formData = new FormData();
-  formData.append('profileImage', file);
-  formData.append('senderId', myId);
-  formData.append('name', name);
-
-  try {
-    const response = await fetch('/', {
-      method: 'POST',
-      body: formData
+        socket.emit('user-message', {
+            text: message,
+            name: name,
+            senderId: myId,
+            roomId:roomId,
+        });
+        messageInput.value = "";
+        messageInput.style.height = 'auto'; // reset height after send
     });
-
-    if (!response.ok) throw new Error('Upload failed');
-    console.log('File uploaded successfully');
-  } catch (err) {
-    console.error('Error uploading file:', err);
-  }
-
-  this.value = ''; // reset file input so user can re-upload the same file
-});
-
-
-
-socket.on('file', (data) => {
-  const bubble = document.createElement('div');
-  bubble.classList.add('message');
-
-  if (data.name === name) {
-    bubble.classList.add('sent');
-  } else {
-    bubble.classList.add('received');
-  }
-
-const fileUrl = data.file;
-const fileName = fileUrl.split('/').pop();
-const fileExt = fileName.split('.').pop().toLowerCase();
-
-// === Main message wrapper ===
-bubble.style.maxWidth = '30%';
-bubble.style.margin = '8px';
-bubble.style.padding = '8px 8px';
-bubble.style.borderRadius = '16px';
-// if( data.name === name) {
-//   bubble.style.background = '#dcf8c6'; // WhatsApp green (sender)
-// } else {
-//   bubble.style.background = '#fff'; // Default white for received
-// }
-bubble.style.color = '#111';
-bubble.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-bubble.style.display = 'inline-block';
-bubble.style.fontSize = '14px';
-bubble.style.lineHeight = '1.4';
-bubble.style.wordBreak = 'break-word';
-  bubble.addEventListener('mouseenter', () => 
-bubble.style.transform = 'scale(1.1)');
-  bubble.addEventListener('mouseleave', () => 
-bubble.style.transform = 'scale(1)');
-
-// === Optional: file label ===
-const nameSpan = document.createElement('span');
-const labelName = document.createElement('span');  // ✅ Fixed here
-const label = document.createElement('div');
-
-nameSpan.textContent = data.name + ": ";
-nameSpan.style.fontWeight = 'bold';
-nameSpan.style.color = 'blue'; // Style for the sender's name
-
-labelName.textContent = `📎 ${fileName}`;
-
-label.style.fontWeight = '500';
-label.style.marginBottom = '6px';
-
-// Add name and file label to label container
-label.appendChild(nameSpan);
-label.appendChild(labelName);
-
-// Append label to the message bubble
-bubble.appendChild(label); // ✅ Make sure 'bubble' is already defined
-
-// === File Preview Container ===
-const preview = document.createElement('div');
-preview.style.marginBottom = '6px';
-
-// === IMAGE ===
-if (/\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl)) {
-  const img = document.createElement('img');
-  img.src = fileUrl;
-  img.style.maxWidth = '100%';
-  img.style.borderRadius = '10px';
-  img.style.marginBottom = '6px';
-  img.style.cursor = 'pointer';
-  img.addEventListener('click', () => window.open(fileUrl, '_blank'));
-  preview.appendChild(img);
-}
-
-// === PDF ===
-else if (/\.pdf$/i.test(fileUrl)) {
-  const embed = document.createElement('embed');
-  embed.src = fileUrl;
-  embed.type = 'application/pdf';
-  embed.width = '100%';
-  embed.height = '250px';
-  embed.style.borderRadius = '10px';
-  preview.appendChild(embed);
-}
-
-// === VIDEO ===
-else if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
-  const video = document.createElement('video');
-  video.src = fileUrl;
-  video.controls = true;
-  video.style.maxWidth = '100%';
-  video.style.borderRadius = '10px';
-  preview.appendChild(video);
-}
-
-// === AUDIO ===
-else if (/\.(mp3|wav|ogg)$/i.test(fileUrl)) {
-  const audio = document.createElement('audio');
-  audio.src = fileUrl;
-  audio.controls = true;
-  audio.style.width = '100%';
-  preview.appendChild(audio);
-}
-
-// === OTHER FILE TYPES (docx, zip, etc.) ===
-else {
-  const icon = document.createElement('div');
-  icon.textContent = '📄'; // fallback icon
-  icon.style.fontSize = '24px';
-  icon.style.marginBottom = '4px';
-  preview.appendChild(icon);
-}
-
-// === Open/Download Button ===
-const btn = document.createElement('button');
-btn.textContent = 'Open';
-btn.style.background = '#075E54';
-btn.style.color = '#fff';
-btn.style.border = 'none';
-btn.style.borderRadius = '8px';
-btn.style.cursor = 'pointer';
-btn.addEventListener('click', () => window.open(fileUrl, '_blank'));
  
-if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl))
-preview.appendChild(btn);
-
-bubble.appendChild(preview);
-
-// === Append to chat container ===
-allMessages.appendChild(bubble);
-scrollToBottom(); // Scroll to the bottom when a new message is added
-});
-
-
-      //for message to sent through enter key
-      messageInput.addEventListener('keypress',(e)=>{
-         if(e.key==="Enter"){
-             e.preventDefault();
+    document.getElementById('profileImage').addEventListener('change', async function () {
+        const file = this.files[0];
+        if (!file) return;
+ 
+        const formData = new FormData();
+        formData.append('profileImage', file);
+        formData.append('senderId', myId);
+        formData.append('name', name);
+        formData.append('roomId', roomId);
+ 
+        try {
+            const response = await fetch('/', {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) throw new Error('Upload failed');
+            console.log('File uploaded successfully');
+        } catch (err) {
+            console.error('Error uploading file:', err);
+        }
+ 
+        this.value = '';
+    });
+ 
+    socket.on('file', (data) => {
+        const bubble = document.createElement('div');
+        bubble.classList.add('message');
+ 
+        if (data.name === name) { 
+            bubble.classList.add('sent');
+        } else {
+            bubble.classList.add('received');
+        }
+ 
+        const fileUrl = data.file;
+        const fileName = fileUrl.split('/').pop();
+        const fileExt = fileName.split('.').pop().toLowerCase();
+ 
+        bubble.style.maxWidth = '30%';
+        bubble.style.margin = '8px';
+        bubble.style.padding = '8px 8px';
+        bubble.style.borderRadius = '16px';
+        bubble.style.color = '#111';
+        bubble.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+        bubble.style.display = 'inline-block';
+        bubble.style.fontSize = '14px';
+        bubble.style.lineHeight = '1.4';
+        bubble.style.wordBreak = 'break-word';
+        bubble.addEventListener('mouseenter', () => bubble.style.transform = 'scale(1.1)');
+        bubble.addEventListener('mouseleave', () => bubble.style.transform = 'scale(1)');
+ 
+        const nameSpan = document.createElement('span');
+        const labelName = document.createElement('span');
+        const label = document.createElement('div');
+ 
+        nameSpan.textContent = data.name + ": ";
+        nameSpan.style.fontWeight = 'bold';
+        nameSpan.style.color = 'blue';
+ 
+        labelName.textContent = `📎 ${fileName}`;
+ 
+        label.style.fontWeight = '500';
+        label.style.marginBottom = '6px';
+ 
+        label.appendChild(nameSpan);
+        label.appendChild(labelName);
+        bubble.appendChild(label);
+ 
+        const preview = document.createElement('div');
+        preview.style.marginBottom = '6px';
+ 
+        if (/\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl)) {
+            const img = document.createElement('img');
+            img.src = fileUrl;
+            img.style.maxWidth = '100%';
+            img.style.borderRadius = '10px';
+            img.style.marginBottom = '6px';
+            img.style.cursor = 'pointer';
+            img.addEventListener('click', () => window.open(fileUrl, '_blank'));
+            preview.appendChild(img);
+        } else if (/\.pdf$/i.test(fileUrl)) {
+            const embed = document.createElement('embed');
+            embed.src = fileUrl;
+            embed.type = 'application/pdf';
+            embed.width = '100%';
+            embed.height = '250px';
+            embed.style.borderRadius = '10px';
+            preview.appendChild(embed);
+        } else if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
+            const video = document.createElement('video');
+            video.src = fileUrl;
+            video.controls = true;
+            video.style.maxWidth = '100%';
+            video.style.borderRadius = '10px';
+            preview.appendChild(video);
+        } else if (/\.(mp3|wav|ogg)$/i.test(fileUrl)) {
+            const audio = document.createElement('audio');
+            audio.src = fileUrl;
+            audio.controls = true;
+            audio.style.width = '100%';
+            preview.appendChild(audio);
+        } else {
+            const icon = document.createElement('div');
+            icon.textContent = '📄';
+            icon.style.fontSize = '24px';
+            icon.style.marginBottom = '4px';
+            preview.appendChild(icon);
+        }
+ 
+        const btn = document.createElement('button');
+        btn.textContent = 'Open';
+        btn.style.background = '#075E54';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '5px';
+        btn.style.padding="5px";
+        btn.style.cursor = 'pointer';
+        btn.addEventListener('click', () => window.open(fileUrl, '_blank'));
+ 
+        if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl))
+            preview.appendChild(btn);
+ 
+        bubble.appendChild(preview);
+        allMessages.appendChild(bubble);
+        scrollToBottom();
+    });
+ 
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
             sendBtn.click();
-         }
-      })
-
-
+        }
+    });
 </script>
 </body>
 </html>
