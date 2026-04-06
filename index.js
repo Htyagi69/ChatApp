@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const multer=require('multer');
 const {Server}=require('socket.io');
 const Chat=require('./models/chat.js');
+const dotenv=require('dotenv')
+dotenv.config();
 
 const app=express();
 app.use(cookieParser());
@@ -13,8 +15,7 @@ const io=new Server(server);
 
 //MongoDb connection
 const mongoose=require('mongoose');
-const { send } = require('process');
-mongoose.connect('mongodb://127.0.0.1:27017/chatApp')
+mongoose.connect(process.env.MONGODB_URL)
 .then(()=>console.log('MongoDB connected'))
 
 const { verifyToken } = require('./authtoken/token');
